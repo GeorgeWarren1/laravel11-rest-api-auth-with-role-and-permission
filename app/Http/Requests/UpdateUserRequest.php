@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 class UpdateUserRequest extends BaseRequest
 {
@@ -23,10 +24,13 @@ class UpdateUserRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $data = Role::pluck('name')->toArray();
+        $roles = implode(',', $data);
         return [
             'name' => 'string|min:2|max:255',
             'email' => 'email|unique:users,email,'. $this->user->id,
-            'image' => 'image|mimes:png,jpg,jpeg|max:2048'
+            'image' => 'image|mimes:png,jpg,jpeg|max:2048',
+            'role' => 'string|in:'.$roles
         ];
     }
 }

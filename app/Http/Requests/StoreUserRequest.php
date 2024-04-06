@@ -6,6 +6,7 @@ use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 class StoreUserRequest extends BaseRequest
 {
@@ -24,11 +25,14 @@ class StoreUserRequest extends BaseRequest
      */
     public function rules(): array
     {
+        $data = Role::pluck('name')->toArray();
+        $roles = implode(',', $data);
         return [
             'name' => 'required|string|min:2|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => ['required', 'confirmed', Password::defaults()],
-            'image' => 'image|mimes:png,jpg,jpeg|max:2048'
+            'image' => 'image|mimes:png,jpg,jpeg|max:2048',
+            'role' => 'required|string|in:'.$roles
         ];
     }
 }

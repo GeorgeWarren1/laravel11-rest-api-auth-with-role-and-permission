@@ -11,6 +11,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Storage;
+use Mockery\Undefined;
 
 class ManageUserController extends Controller
 {
@@ -20,7 +21,11 @@ class ManageUserController extends Controller
      */
     public function index(): JsonResource
     {
-        $data = getAllPaginate(new User, 'name', 10);
+        $data = getAllPaginate(
+            new User,
+            'name',
+            10
+        );
         return UserResource::collection($data);
     }
 
@@ -35,7 +40,13 @@ class ManageUserController extends Controller
 
         $validated['image'] = $image;
 
-        User::create($validated);
+        $role = $validated['role'];
+
+        unset($validated['role']);
+
+        $user = User::create($validated);
+
+        $user->assignRole($role);
 
         return response()->json(['message' => 'Success Add User']);
     }
@@ -59,7 +70,13 @@ class ManageUserController extends Controller
 
         $validated['image'] = $image;
 
+        $role = $validated['role'];
+
+        unset($validated['role']);
+
         $user->update($validated);
+
+        $user->syncRoles($role);
 
         return response()->json(['message' => 'Success Update User']);
     }
