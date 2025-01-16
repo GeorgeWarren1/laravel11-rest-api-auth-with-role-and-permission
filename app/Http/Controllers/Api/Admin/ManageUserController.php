@@ -85,12 +85,23 @@ class ManageUserController extends Controller
      * Remove the specified resource from storage.
      */
     public function destroy(User $user): JsonResponse
-    {
-        if ($user->image) {
-            Storage::delete($this->pathImage . '/' . $user->image);
-        }
-        if ($user->delete()) {
-            return response()->json(['message' => 'Berhasil hapus user'], 200);
-        }
+{
+    // Check if the user has an image and delete it
+    if ($user->image) {
+        Storage::delete($this->pathImage . '/' . $user->image);
     }
+
+    // Delete the user and return a success response if deleted
+    if ($user->delete()) {
+        return response()->json([
+            'message' => 'User Deleted',
+        ], 200);
+    }
+
+    // Return a failure response if the delete operation fails
+    return response()->json([
+        'message' => 'User could not be deleted',
+    ], 500);
+}
+
 }
