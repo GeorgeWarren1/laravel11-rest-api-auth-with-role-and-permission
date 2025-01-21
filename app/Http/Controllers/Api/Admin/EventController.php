@@ -34,10 +34,16 @@ class EventController extends Controller
         ]);
 
         // Handle file upload
-        $path = $request->file('event_image')->store('public/events');
+        $file = $request->file('event_image');
+        $fileName = $file->hashName();
+        $file->storeAs('public/events', $fileName);
 
+        // Construct the public path
+        $publicPath = "public/storage/events/{$fileName}";
+
+        // Create the event record in the database
         $event = Event::create([
-            'event_image' => $path,
+            'event_image' => $publicPath,
             'event_title' => $request->event_title,
             'event_type' => $request->event_type,
             'date' => $request->date,
@@ -78,11 +84,18 @@ class EventController extends Controller
         // Handle file upload if provided
         if ($request->hasFile('event_image')) {
             // Delete old image
-            Storage::delete($event->event_image);
-            $path = $request->file('event_image')->store('public/events');
-            $event->event_image = $path;
+            Storage::delete(str_replace('public/storage', 'public', $event->event_image));
+
+            // Upload new image
+            $file = $request->file('event_image');
+            $fileName = $file->hashName();
+            $file->storeAs('public/events', $fileName);
+
+            // Update event_image path
+            $event->event_image = "public/storage/events/{$fileName}";
         }
 
+        // Update other fields
         $event->update($request->only([
             'event_title',
             'event_type',
@@ -104,8 +117,9 @@ class EventController extends Controller
     public function destroy(Event $event)
     {
         // Delete image
-        Storage::delete($event->event_image);
+        Storage::delete(str_replace('public/storage', 'public', $event->event_image));
 
+        // Delete event record
         $event->delete();
 
         return response()->json([

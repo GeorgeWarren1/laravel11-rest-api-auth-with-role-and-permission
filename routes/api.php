@@ -5,6 +5,9 @@ use App\Http\Controllers\Api\Admin\LocationController;
 use App\Http\Controllers\Api\Admin\EventController;
 use App\Http\Controllers\Auth\AuthController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\Admin\WorkstreamController;
+
+Route::get('/positions', [WorkstreamController::class, 'getPositions']);
 
 app('request')->headers->set('Accept', 'application/json');
 

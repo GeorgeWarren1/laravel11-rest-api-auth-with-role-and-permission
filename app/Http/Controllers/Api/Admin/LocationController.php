@@ -33,10 +33,16 @@ class LocationController extends Controller
         ]);
 
         // Handle file upload
-        $path = $request->file('location_image')->store('public/locations');
+        $file = $request->file('location_image');
+        $fileName = $file->hashName();
+        $file->storeAs('public/locations', $fileName);
 
+        // Construct the public path
+        $publicPath = "public/storage/locations/{$fileName}";
+
+        // Create the location record in the database
         $location = Location::create([
-            'location_image' => $path,
+            'location_image' => $publicPath,
             'location_name' => $request->location_name,
             'address' => $request->address,
             'description' => $request->description,
@@ -75,11 +81,18 @@ class LocationController extends Controller
         // Handle file upload if provided
         if ($request->hasFile('location_image')) {
             // Delete old image
-            Storage::delete($location->location_image);
-            $path = $request->file('location_image')->store('public/locations');
-            $location->location_image = $path;
+            Storage::delete(str_replace('public/storage', 'public', $location->location_image));
+
+            // Upload new image
+            $file = $request->file('location_image');
+            $fileName = $file->hashName();
+            $file->storeAs('public/locations', $fileName);
+
+            // Update location_image path
+            $location->location_image = "public/storage/locations/{$fileName}";
         }
 
+        // Update other fields
         $location->update($request->only([
             'location_name',
             'address',
@@ -100,8 +113,9 @@ class LocationController extends Controller
     public function destroy(Location $location)
     {
         // Delete image
-        Storage::delete($location->location_image);
+        Storage::delete(str_replace('public/storage', 'public', $location->location_image));
 
+        // Delete location record
         $location->delete();
 
         return response()->json([
