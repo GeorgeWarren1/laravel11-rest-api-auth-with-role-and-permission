@@ -73,11 +73,11 @@ class EventController extends Controller
     {
         $request->validate([
             'event_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'event_title' => 'required|string|max:255',
-            'event_type' => 'required|in:Love Kitchen,OtherType1,OtherType2',
-            'date' => 'required|date_format:Y-m-d',
-            'time' => 'required|date_format:H:i',
-            'location' => 'required|string|max:255',
+            'event_title' => 'string|max:255',
+            'event_type' => 'string',
+            'date' => 'date_format:Y-m-d',
+            'time' => 'date_format:H:i',
+            'location' => 'string|max:255',
             'description' => 'nullable|string|max:500',
         ]);
 

@@ -71,11 +71,11 @@ class LocationController extends Controller
     {
         $request->validate([
             'location_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
-            'location_name' => 'required|string|max:255|unique:locations,location_name,' . $location->id,
-            'address' => 'required|string|max:255',
+            'location_name' => 'string|max:255|unique:locations,location_name,' . $location->id,
+            'address' => 'string|max:255',
             'description' => 'nullable|string|max:500',
-            'latitude' => 'required|numeric|between:-90,90',
-            'longitude' => 'required|numeric|between:-180,180',
+            'latitude' => 'numeric|between:-90,90',
+            'longitude' => 'numeric|between:-180,180',
         ]);
 
         // Handle file upload if provided
